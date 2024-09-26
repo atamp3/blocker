@@ -70,18 +70,21 @@ public class UnitTests {
 	}
 	
 	public static void testLeafValue() throws Exception {
+		System.out.println("Testing leaf() and value() for agent A");
 		s.read("data/board.txt");
 		if (s.isLeaf() | s.value(0)!=0 | s.value(1)!=0) {
 			throw new Exception("Unit test error: leaf: start board should not be a leaf and value should be 0 for both agents") ;
 		}
-		s.agentX[1]=3;
-		s.agentY[1]=4;
+		s.board[3][1]='#';
+		s.board[3][2]='#';
+		s.board[2][2]='#';
+		
 		if (!s.isLeaf()| s.value(0)!=1 | s.value(1)!=-1) {
-			throw new Exception("Unit test error: leaf: when at 3,4 state must be a leaf due to B, and value must be 1 for A and -1 for B.") ;
+			throw new Exception("Unit test error: leaf: when completely blocking agent B, it has no more moves, the state must be a leaf and the value must be 1 for A and -1 for B.") ;
 		}
 		s.food=0;
 		if (!s.isLeaf()) {
-			throw new Exception("Unit test error: leaf: when food is eaten, must be a leaf.") ;
+			throw new Exception("Unit test error: leaf: when all food is eaten, the state must be a leaf.") ;
 		}
 	}
 }
