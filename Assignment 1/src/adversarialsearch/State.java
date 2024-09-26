@@ -14,11 +14,13 @@ public class State {
     public int turn ; //who ’ s turn it is , agent 0 or agent 1
     public int food ; // the total amount of food still available
     public Vector<String> moves; // List of actions executed so far
+    private Vector<int[]> foodLocations; // List of food coordinates
 
     // No-argument constructor
     public State() {
         // Fields will be initialized in the read method
         this.moves = new Vector<>();
+        this.foodLocations = new Vector<>();
     }
 
     private int width;
@@ -53,6 +55,7 @@ public class State {
                         agentY[1] = i;
                     } else if (c == '*') {
                         food++;
+                        foodLocations.add(new int[]{i, j});
                     }
                 }
             }
@@ -121,7 +124,12 @@ public class State {
         if (x > 0 && board[y][x-1] != '#') moves.add("left");
 
         // Check if eat is possible
-        if (board[y][x] == '*') moves.add("eat");
+        for (int[] foodLocation : foodLocations) {
+            if (foodLocation[0] == y && foodLocation[1] == x) {
+                moves.add("eat");
+                break;
+            }
+        }
 
         // Check if block is possible (always possible on empty spaces or agent positions)
         if (board[y][x] == ' ' || board[y][x] == 'A' || board[y][x] == 'B') moves.add("block");
@@ -139,9 +147,6 @@ public class State {
         int x = agentX[currentAgent];
         int y = agentY[currentAgent];
 
-        // Remove the agent from its current position
-        board[y][x] = ' ';
-
         // Execute the action
         switch (action) {
             case "up": agentY[currentAgent]--; break;
@@ -149,13 +154,21 @@ public class State {
             case "down": agentY[currentAgent]++; break;
             case "left": agentX[currentAgent]--; break;
             case "eat":
-                if (board[y][x] == '*') {
-                    score[currentAgent]++;
-                    food--;
+                for (int i = 0; i < foodLocations.size(); i++) {
+                    int[] foodLocation = foodLocations.get(i);
+                    if (foodLocation[0] == y && foodLocation[1] == x) {
+                        score[currentAgent]++;
+                        food--;
+                        foodLocations.remove(i);
+                        break;
+                    }
                 }
                 break;
             case "block": board[y][x] = '#'; break;
         }
+
+        // Remove the agent from its current position
+        board[y][x] = ' ';
 
         // Update the agent's new position on the board
         x = agentX[currentAgent];
@@ -174,17 +187,12 @@ public class State {
         // Check if there's no food left
         if (food == 0) return true;
         
-        // Check if any agent is in a corner
+        // Check if either agent has no legal moves left
         for (int i = 0; i < 2; i++) {
-            if (isInCorner(agentX[i], agentY[i])) return true;
+            if (legalMoves(i).isEmpty()) return true;
         }
         
         return false;
-    }
-
-    private boolean isInCorner(int x, int y) {
-        // Check if the agent is in any corner, including the edges
-        return (x <= 1 || x >= width - 2) && (y <= 1 || y >= height - 2);
     }
 
     // Assignemnt 1a Question 8
@@ -194,10 +202,16 @@ public class State {
             return score[agent] - score[1 - agent];
         }
         
-        // If an agent is in a corner, return win/loss value
+        // Check if either agent has no legal moves left
         for (int i = 0; i < 2; i++) {
-            if (isInCorner(agentX[i], agentY[i])) {
-                return (i == agent) ? -1 : 1;
+            if (legalMoves(i).isEmpty()) {
+                // If the current agent has no moves, they lose
+                if (i == agent) {
+                    return -1;
+                } else {
+                    // If the other agent has no moves, the current agent wins
+                    return 1;
+                }
             }
         }
         

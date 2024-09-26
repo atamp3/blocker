@@ -17,6 +17,8 @@ public class Game {
 			System.out.println("Legal moves for agent with turn:"+b.legalMoves());
 			b.execute(b.legalMoves().get((int)(Math.random()*b.legalMoves().size())));
 		}
+		System.out.println("Game over!");
+		System.out.println(b.toString());
 	}
 	
 }
