@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
+// Assignemnt 1a Question 1
 public class State {
     public char [ ] [ ] board ; // the board as a 2D character array [ height ] [ width ]
     public int [ ] agentX ; // the x−coordinates of the agents , agentX [ 0 ] = x_agent0
@@ -14,7 +15,7 @@ public class State {
     public int food ; // the total amount of food still available
     public Vector<String> moves; // List of actions executed so far
 
-    // Add this no-argument constructor
+    // No-argument constructor
     public State() {
         // Fields will be initialized in the read method
         this.moves = new Vector<>();
@@ -23,6 +24,7 @@ public class State {
     private int width;
     private int height;
 
+    // Assignemnt 1a Question 2
     public void read(String filename) {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String[] dimensions = br.readLine().split(" ");
@@ -59,6 +61,7 @@ public class State {
         }
     }
 
+    // Assignemnt 1a Question 3
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
@@ -81,6 +84,7 @@ public class State {
         return sb.toString();
     }
 
+    // Assignemnt 1a Question 4
     public State copy() {
         State newState = new State();
         
@@ -104,6 +108,7 @@ public class State {
         return newState;
     }
 
+    // Assignemnt 1a Question 5
     public Vector<String> legalMoves(int agent) {
         Vector<String> moves = new Vector<>();
         int x = agentX[agent];
@@ -128,6 +133,7 @@ public class State {
         return legalMoves(turn);
     }
 
+    // Assignemnt 1a Question 6
     public void execute(String action) {
         int currentAgent = turn;
         int x = agentX[currentAgent];
@@ -163,6 +169,7 @@ public class State {
         turn = 1 - turn;
     }
 
+    // Assignemnt 1a Question 7
     public boolean isLeaf() {
         // Check if there's no food left
         if (food == 0) return true;
@@ -180,6 +187,7 @@ public class State {
         return (x <= 1 || x >= width - 2) && (y <= 1 || y >= height - 2);
     }
 
+    // Assignemnt 1a Question 8
     public int value(int agent) {
         // If no food left, compare scores
         if (food == 0) {
